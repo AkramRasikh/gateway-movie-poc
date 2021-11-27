@@ -1,13 +1,40 @@
-const request = require("supertest");
-const { app: mockApp } = require("../app");
+const request = require('supertest');
+const { app: mockApp } = require('../app');
+const { default: axios } = require('axios');
+jest.mock('axios');
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-it("add payment should call payment service", async () => {
-  await request(mockApp).post("/").expect(422);
-  // expect payment api to be called with body ...
+const mockRes = [
+  {
+    id: 1,
+    title: 'Titanic',
+  },
+  {
+    id: 2,
+    title: 'Love actually',
+  },
+  {
+    id: 3,
+    title: 'Friday',
+  },
+  {
+    id: 4,
+    title: 'Parasite',
+  },
+];
+
+it('get /movies should return movies & 200', async () => {
+  axios.get.mockImplementation(() => ({ data: mockRes }));
+  const response = await request(mockApp).get('/movies');
+  expect(response.body).toEqual(mockRes);
+  expect(response.status).toEqual(200);
 });
 
-it("add payment should respond with error status", async () => {});
+it('get /movies should return error', async () => {
+  axios.get.mockImplementation(() => Promise.reject());
+  const response = await request(mockApp).get('/movies');
+  expect(response.status).toEqual(400);
+});
