@@ -4,7 +4,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const { default: axios } = require('axios');
+const cors = require('cors');
 
+app.use(cors());
 app.use(bodyParser.json());
 
 app.get('/movies', async (_, res) => {
@@ -13,6 +15,20 @@ app.get('/movies', async (_, res) => {
     res.status(200).send(data);
   } catch (error) {
     res.status(400).send('err sending movies');
+  }
+});
+
+app.get('/payments', async (req, res) => {
+  try {
+    const { data: response } = await axios.get(
+      `${process.env.PAYMENT_URL}/payments`,
+      req.body
+    );
+    console.log('all payments: ', response);
+    res.status(200).send(response);
+  } catch (err) {
+    // sort error handling
+    res.status(404).send('Cannot get payments 🤕');
   }
 });
 
